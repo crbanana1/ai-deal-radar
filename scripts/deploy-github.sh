@@ -56,8 +56,13 @@ if git ls-files --error-unmatch "$TOKEN_FILE" >/dev/null 2>&1; then
   fail "$TOKEN_FILE 被 git 跟踪了，已停止。请确认 .gitignore 生效。"
 fi
 if ! git rev-parse --verify HEAD >/dev/null 2>&1; then
+  COMMIT_MESSAGE="Initial AI deal radar monitor"
+else
+  COMMIT_MESSAGE="Add daily digest workflow"
+fi
+if ! git diff --cached --quiet; then
   git -c user.name="$USER" -c user.email="${USER}@users.noreply.github.com" \
-    commit -m "Initial AI deal radar monitor"
+    commit -m "$COMMIT_MESSAGE"
 fi
 
 step "创建或连接仓库"
@@ -105,12 +110,32 @@ else
   fi
 fi
 
+step "触发每日简报测试"
+"$GH_BIN" workflow run daily-digest.yml --repo "$USER/$REPO_NAME"
+sleep 8
+DIGEST_ID="$("$GH_BIN" run list --repo "$USER/$REPO_NAME" --workflow daily-digest.yml --limit 1 --json databaseId --jq '.[0].databaseId' 2>/dev/null || true)"
+if [ -z "$DIGEST_ID" ] || [ "$DIGEST_ID" = "null" ]; then
+  echo "暂时没拿到日报运行 ID，请打开 Actions 页面查看。"
+else
+  echo "日报运行地址：https://github.com/$USER/$REPO_NAME/actions/runs/$DIGEST_ID"
+  set +e
+  "$GH_BIN" run watch "$DIGEST_ID" --repo "$USER/$REPO_NAME" --exit-status
+  DIGEST_STATUS=$?
+  set -e
+  if [ "$DIGEST_STATUS" -eq 0 ]; then
+    echo "每日简报发送成功。"
+  else
+    echo "每日简报发送失败，请把 deploy.log 最后 40 行发给我。"
+  fi
+fi
+
 step "完成"
 echo "仓库：https://github.com/$USER/$REPO_NAME"
 echo "Actions：https://github.com/$USER/$REPO_NAME/actions"
 echo
 echo "下一步："
-echo "1. 查收 163 邮箱的汇总邮件（可能在垃圾箱）。"
-echo "2. 每 7 天运行一次 Check In workflow。"
-echo "3. 缓存/产物每 3 天自动清理。"
-echo "4. 确认成功后删除 github-token.txt：PAT 很敏感。"
+echo "1. 查收 163 邮箱的羊毛汇总和每日简报（可能在垃圾箱）。"
+echo "2. 每日简报每天 10:30 发送（GitHub 可能延迟）。"
+echo "3. 每 7 天运行一次 Check In workflow。"
+echo "4. 缓存/产物每 3 天自动清理。"
+echo "5. 确认成功后删除 github-token.txt：PAT 很敏感。"

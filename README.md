@@ -1,6 +1,6 @@
 # AI 羊毛雷达（ai-deal-radar）
 
-监控国内 AI 厂商的免费额度、试用、赠送、学生/开发者福利和降价活动，发现**新的**羊毛后用邮件通知。
+监控国内 AI 厂商的免费额度、试用、赠送、学生/开发者福利和降价活动，发现**新的**羊毛后用邮件即时通知；每天 10:30 另发一封综合简报。
 
 本项目基于开源项目 [TrendRadar](https://github.com/sansan0/TrendRadar) v6.11.0 改造，遵循 GPL-3.0。上游文档见 [TrendRadar 仓库](https://github.com/sansan0/TrendRadar)。
 
@@ -19,10 +19,26 @@ GitHub Actions（每 15 分钟尝试一次）
         └─ 有新增命中 → 发 HTML 邮件；没有 → 不发
 ```
 
-- 热榜平台已关闭，避免娱乐/社会新闻噪声。
+- 羊毛监控关闭热榜平台，避免娱乐/社会新闻噪声。
 - 不调用大模型，不需要额外的 LLM API Key。
 - 只配置了邮件渠道；微信/飞书/钉钉等渠道保持关闭。
 - 首次运行会发送一封“当前匹配汇总”；之后只发新增。
+
+## 每日综合简报（10:30）
+
+`.github/workflows/daily-digest.yml` 每天北京时间 10:30 发送一封综合简报，和羊毛告警互不影响：
+
+- 今日要闻：60s API，15 条；限流时自动回退到今日头条热榜
+- AI 行业摘要：橘鸦 AI 早报概览 8 条，附完整早报链接；失败时回退到 IT之家 AI 标题
+- GitHub Trending：每日热门项目，8 条
+- 知乎热榜：6 条
+- 今日头条：6 条
+
+橘鸦早报通常在 08:54-10:26 更新，所以日报放在 10:30。数据源都是公开 API/RSS/页面，不需要额外 Key。可以在 Actions → **Daily Digest** → Run workflow 手动触发；本地预览：
+
+```bash
+bash scripts/run-digest.sh --dry-run
+```
 
 ## 一键部署到 GitHub Actions
 
@@ -41,7 +57,8 @@ GitHub Actions（每 15 分钟尝试一次）
    | `EMAIL_SMTP_PORT` | 否 | 留空自动识别；QQ/163 通常为 `465` |
 
 4. 打开 **Actions → AI Wool Radar → Run workflow** 手动跑一次。首次运行会发当前匹配汇总。
-5. **每 7 天运行一次 `Check In` workflow**。TrendRadar 的 Actions 版本有 7 天试用期，不签到会自动停用 crawler workflow。
+5. **Actions → Daily Digest → Run workflow** 可立即测试每日简报；之后每天 10:30 自动发送。
+6. **每 7 天运行一次 `Check In` workflow**。TrendRadar 的 Actions 版本有 7 天试用期，不签到会自动停用 crawler workflow。
 
 ### 邮箱设置
 
@@ -56,6 +73,8 @@ GitHub Actions（每 15 分钟尝试一次）
 ```yaml
 - cron: "*/15 * * * *"
 ```
+
+每日简报的 cron 是 `30 2 * * *`（北京时间 10:30）。
 
 GitHub 的 scheduled workflow **不保证准时**，高峰时可能延迟几分钟到数小时；这是免费 runner 的固有限制。Actions 的 cron 使用 UTC 时间。
 
@@ -149,7 +168,8 @@ Google News 负责召回，最终是否命中由 `config/frequency_words.txt` �
 - **覆盖范围**：只监控 RSS / Google News 能收录的内容；官网独有的活动页（限时券、注册送额度等）如果没被媒体收录，可能漏掉。本项目暂未实现官网页面 diff 监控。
 - **硬件类优惠**：如“买手机送 Token”“豆包手机降价”也会命中；如果只想要 API/云服务羊毛，可在关键词中排除手机/耳机/眼镜等词。
 - **首次运行 / 缓存丢失**：首次运行会发汇总；Actions 缓存被清理后可能重新按首次运行处理。
-- **邮件送达**：本地已用假 SMTP 验证邮件构造与主题；真实收件箱送达需要你配置授权码后验证。
+- **每日简报来源**：依赖 60s、NewsNow、橘鸦 AI 早报、IT之家、GitHub Trending 的公开接口/页面；60s 限流时回退今日头条，橘鸦失败时回退 IT之家，其它源失效时邮件会带失败警告。
+- **邮件送达**：163 邮箱的测试邮件已实际发送成功；如未收到请检查垃圾箱。
 
 ## 验证记录（2026-10-20）
 
@@ -158,7 +178,9 @@ Google News 负责召回，最终是否命中由 `config/frequency_words.txt` �
 - 去重后约 14 个标题、8 个不同事件；示例：腾讯云免费赠送标准带宽、WorkBuddy 限时免费至 10/31、阶跃星辰开放权重免费下载、OpenCode 免费提供 DeepSeek V4.1 Flash。
 - 第二轮：396 条，检测到 12 条新增，其中 1 条命中（OpenCode 同一事件的另一家媒体）；说明 URL 级增量去重生效，但跨媒体重复仍需后续优化。
 - 邮件构造：假 SMTP 验证通过，主题格式为 `[AI羊毛] 增量分析 - 10月20日 12:23`，HTML 正文约 99 KB。
-- **未验证**：GitHub Actions 实际运行、真实 SMTP 发信到收件箱；需要部署仓库和邮箱授权码后再验证。
+- 仓库已部署为 public；首次 crawler Actions 运行成功（2026-10-20）。
+- 每日简报本地预览：橘鸦 AI 摘要 8 条；60s 限流时自动回退到今日头条，整体约 38-43 条。
+- **待验证**：每日简报的 Actions 云端运行和最终邮件（工作流已写好，等待下一次推送后触发）。
 
 ## 目录
 
@@ -166,7 +188,7 @@ Google News 负责召回，最终是否命中由 `config/frequency_words.txt` �
 ai-deal-radar/
 ├─ config/config.yaml          # 源、报告、通知、存储配置
 ├─ config/frequency_words.txt  # 羊毛关键词规则
-├─ .github/workflows/         # crawler（扫描）、Check In（续期）、Cleanup Caches（清理缓存）
+├─ .github/workflows/         # 羊毛扫描、每日简报、Check In（续期）、Cleanup Caches（清理缓存）
 ├─ scripts/                   # 本地运行/测试邮件
 ├─ trendradar/                # TrendRadar 核心
 ├─ output/                    # 本地状态与报告（不提交）
