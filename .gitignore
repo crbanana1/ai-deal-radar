@@ -1,0 +1,13 @@
+.venv/
+output/
+index.html
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.env
+local.env
+scripts/github-login.cmd
+scripts/open-email-config.cmd
+github-token.txt
+deploy.log
+.DS_Store

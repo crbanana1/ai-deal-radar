@@ -1,0 +1,101 @@
+# ═══════════════════════════════════════════════════════════════
+#          AI 羊毛雷达关键词规则
+#   只推送：免费额度/试用、学生/开发者福利、降价/限时优惠
+#   语法：+ 必须匹配；普通行组内任一；! 全局排除；/.../ 正则
+#   组之间用空行分隔，每组第一行 [组名] 是显示名称
+# ═══════════════════════════════════════════════════════════════
+
+[GLOBAL_FILTER]
+震惊
+/彩票|博彩|开户|贷款|招聘|内推|校招|社招|捕鱼|棋牌/
+/教程|代码|脚本|代理|配置教程|部署教程|使用指南|上手|实测|评测|解读|商业模式|变现模式|产品部|想做什么|如何|怎么/
+/日报|早报|晚报|周报|每日瞰AI/
+/融资|财报|股价|高管|离职|裁员|收购|上市|副总裁/
+
+[WORD_GROUPS]
+
+[免费额度/试用]
++/通义|千问|Qwen|阿里云|百炼|\bPAI\b|灵积|豆包|Doubao|火山引擎|火山方舟|方舟|混元|腾讯云|文心|ERNIE|千帆|百度智能云|智谱|GLM|BigModel|DeepSeek|深度求索|Kimi|月之暗面|Moonshot|MiniMax|海螺|阶跃|StepFun|跃问|讯飞|星火|Spark|商汤|日日新|SenseNova|百川|Baichuan|零一万物|硅基流动|SiliconFlow|魔搭|ModelScope|Trae|扣子|Coze|可灵|Kling|Qoder|通义灵码|CodeGeeX|MarsCode|华为云|盘古|昇腾|ModelArts|书生|InternLM|浦语|天工|昆仑万维|360智脑|面壁|MiniCPM|无问芯穹|潞晨/
+免费
+限免
+限时免费
+白嫖
+薅羊毛
+0元
+零元
+免费领
+免费送
+免费试用
+免费体验
+免费额度
+免费调用
+免费token
+赠送
+送额度
+送Token
+代金券
+体验金
+试用金
+算力券
+资源包
+注册送
+新用户
+免费期
+free trial
+free tier
+free credits
+
+[学生/开发者福利]
++/通义|千问|Qwen|阿里云|百炼|\bPAI\b|灵积|豆包|Doubao|火山引擎|火山方舟|方舟|混元|腾讯云|文心|ERNIE|千帆|百度智能云|智谱|GLM|BigModel|DeepSeek|深度求索|Kimi|月之暗面|Moonshot|MiniMax|海螺|阶跃|StepFun|跃问|讯飞|星火|Spark|商汤|日日新|SenseNova|百川|Baichuan|零一万物|硅基流动|SiliconFlow|魔搭|ModelScope|Trae|扣子|Coze|可灵|Kling|Qoder|通义灵码|CodeGeeX|MarsCode|华为云|盘古|昇腾|ModelArts|书生|InternLM|浦语|天工|昆仑万维|360智脑|面壁|MiniCPM|无问芯穹|潞晨/
++/学生|校园|高校|教育|科研|开发者|创业|初创|学术/
+免费
+免费额度
+赠送
+送额度
+试用
+优惠
+折扣
+补贴
+认证
+权益
+教育优惠
+开发者计划
+开发者福利
+开发者免费
+
+[降价/限时优惠]
++/通义|千问|Qwen|阿里云|百炼|\bPAI\b|灵积|豆包|Doubao|火山引擎|火山方舟|方舟|混元|腾讯云|文心|ERNIE|千帆|百度智能云|智谱|GLM|BigModel|DeepSeek|深度求索|Kimi|月之暗面|Moonshot|MiniMax|海螺|阶跃|StepFun|跃问|讯飞|星火|Spark|商汤|日日新|SenseNova|百川|Baichuan|零一万物|硅基流动|SiliconFlow|魔搭|ModelScope|Trae|扣子|Coze|可灵|Kling|Qoder|通义灵码|CodeGeeX|MarsCode|华为云|盘古|昇腾|ModelArts|书生|InternLM|浦语|天工|昆仑万维|360智脑|面壁|MiniCPM|无问芯穹|潞晨/
+降价
+下调
+价格下调
+折扣
+打折
+特惠
+半价
+限时优惠
+返现
+充值送
+买一送一
+促销
+1折
+5折
+价格调整
+
+[AI羊毛线索]
++/AI|大模型|模型|Token|token|API|api|算力|GPU|智能体/
+免费额度
+免费调用
+免费Token
+免费token
+限免
+白嫖
+薅羊毛
+免费领
+免费送
+注册送
+0元
+零元
+代金券
+体验金
+/赠送.*(Token|token|额度|积分)/
+/送.*(Token|token|额度|积分)/
