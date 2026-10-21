@@ -135,7 +135,7 @@ echo "Actions：https://github.com/$USER/$REPO_NAME/actions"
 echo
 echo "下一步："
 echo "1. 查收 163 邮箱的羊毛汇总和每日简报（可能在垃圾箱）。"
-echo "2. 每日简报每天 10:30 发送（GitHub 可能延迟）。"
+echo "2. 每日简报 10:30 起多次尝试，当天只发一次（GitHub 仍可能延迟）。"
 echo "3. 每 7 天运行一次 Check In workflow。"
 echo "4. 缓存/产物每 3 天自动清理。"
 echo "5. 确认成功后删除 github-token.txt：PAT 很敏感。"

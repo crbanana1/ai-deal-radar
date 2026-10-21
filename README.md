@@ -24,9 +24,9 @@ GitHub Actions（每 15 分钟尝试一次）
 - 只配置了邮件渠道；微信/飞书/钉钉等渠道保持关闭。
 - 首次运行会发送一封“当前匹配汇总”；之后只发新增。
 
-## 每日综合简报（10:30）
+## 每日综合简报（10:30 起）
 
-`.github/workflows/daily-digest.yml` 每天北京时间 10:30 发送一封综合简报，和羊毛告警互不影响：
+`.github/workflows/daily-digest.yml` 在北京时间 10:00-14:50 每 10 分钟尝试一次，10:30 前跳过；当天第一次发送成功后写入缓存，后续运行不再重复。GitHub 仍可能延迟或跳过，无法保证正好 10:30。它和羊毛告警互不影响：
 
 - 今日要闻：60s API，15 条；限流时自动回退到今日头条热榜
 - AI 行业摘要：橘鸦 AI 早报概览 8 条，附完整早报链接；失败时回退到 IT之家 AI 标题
@@ -57,7 +57,7 @@ bash scripts/run-digest.sh --dry-run
    | `EMAIL_SMTP_PORT` | 否 | 留空自动识别；QQ/163 通常为 `465` |
 
 4. 打开 **Actions → AI Wool Radar → Run workflow** 手动跑一次。首次运行会发当前匹配汇总。
-5. **Actions → Daily Digest → Run workflow** 可立即测试每日简报；之后每天 10:30 自动发送。
+5. **Actions → Daily Digest → Run workflow** 可立即测试每日简报；之后每天 10:30 起按多次尝试发送，当天只发一次。
 6. **每 7 天运行一次 `Check In` workflow**。TrendRadar 的 Actions 版本有 7 天试用期，不签到会自动停用 crawler workflow。
 
 ### 邮箱设置
@@ -74,7 +74,7 @@ bash scripts/run-digest.sh --dry-run
 - cron: "*/15 * * * *"
 ```
 
-每日简报的 cron 是 `30 2 * * *`（北京时间 10:30）。
+每日简报的 cron 是 `*/10 2-6 * * *`，对应北京时间 10:00-14:50；10:30 前跳过，首次成功后当天不再发。
 
 GitHub 的 scheduled workflow **不保证准时**，高峰时可能延迟几分钟到数小时；这是免费 runner 的固有限制。Actions 的 cron 使用 UTC 时间。
 
@@ -164,6 +164,7 @@ Google News 负责召回，最终是否命中由 `config/frequency_words.txt` �
 
 - **时效性**：GitHub Actions 的 cron 是尽力而为，无法保证“立刻”。实测/社区反馈可能延迟几分钟到数小时。
 - **7 天签到**：Actions 版 TrendRadar 每 7 天需要手动运行 `Check In`，否则 crawler 自动停用。
+- **GitHub 定时不可靠**：实测 Daily Digest 的单次 10:30 cron 没有触发，crawler 的 15 分钟 cron 也被延迟到数小时一次。日报已改为 10:30 起多次尝试并做当天去重，但仍可能晚到或漏发。
 - **跨媒体重复**：同一活动被多家媒体报道时，标题不同、链接不同，可能收到近似重复的邮件。当前只做 URL/来源级去重，未做语义去重。
 - **覆盖范围**：只监控 RSS / Google News 能收录的内容；官网独有的活动页（限时券、注册送额度等）如果没被媒体收录，可能漏掉。本项目暂未实现官网页面 diff 监控。
 - **硬件类优惠**：如“买手机送 Token”“豆包手机降价”也会命中；如果只想要 API/云服务羊毛，可在关键词中排除手机/耳机/眼镜等词。
